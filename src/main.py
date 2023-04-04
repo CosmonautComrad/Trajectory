@@ -1,4 +1,5 @@
 import cv2
+import random
 
 from clicker import select_coord_on_img
 from distr import *
@@ -66,11 +67,33 @@ def measure_momental_profit(distr, real_value, new_predict, curr_predict=None):
     return momental_profit
 
 
+def get_one_pixel_sample(sample_size: int, img) -> list:
+    full_sample = img.ravel()
+    S_1 = [random.choice(full_sample) for _ in range(sample_size)]
+
+    return S_1
+
+
+def get_sample_for_bio_sensor(sensor_radius: int, sample_size: int, img) -> list:
+    full_sample = img.ravel()
+    r_squared = sensor_radius ** 2
+    S_r = []
+
+    for _ in range(sample_size):
+        left = random.randint(0, len(full_sample) - r_squared)
+        right = left + r_squared
+
+        S_r.append(np.mean(full_sample[left:right]))
+
+    return S_r
+
+
 root = '../data/apple'
 img_num = 100
 img = open_img(root, img_num)
-show_img(img)
 sample = img.ravel()
+print(get_one_pixel_sample(10, img))
+print(get_sample_for_bio_sensor(4, 10, img))
 
 r_1, r_2, u, etalon_1, etalon_2 = get_data_from_user(img)
 
