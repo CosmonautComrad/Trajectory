@@ -3,7 +3,8 @@ import random
 
 from clicker import select_coord_on_img
 from distr import *
-
+from tqdm import tqdm
+from random import randint
 
 def open_img(root, num):
     pic = cv2.imread(root + str(num) + '.png', cv2.IMREAD_UNCHANGED)
@@ -88,6 +89,30 @@ def get_sample_for_bio_sensor(sensor_radius: int, sample_size: int, img) -> list
     return S_r
 
 
+def get_means_sample(img, r, size):
+    back_color = 255
+
+    means_sample = []
+    pix_sample = []
+
+    for _ in tqdm(range(size)):
+        x = randint(0, img.shape[0] - 1)
+        y = randint(0, img.shape[1] - 1)
+
+        for i in range(x, x + r):
+            for j in range(y, y + r):
+                if i < img.shape[0] and j < img.shape[1]:
+                    pix_sample.append(img[i][j])
+                else:
+                    pix_sample.append(back_color)
+
+        means_sample.append(np.mean(pix_sample))
+        print(len(pix_sample))
+        pix_sample = []
+
+    return means_sample
+
+
 root = '../data/apple'
 img_num = 100
 img = open_img(root, img_num)
@@ -100,3 +125,5 @@ r_1, r_2, u, etalon_1, etalon_2 = get_data_from_user(img)
 my_distr = Distr(0, 255, sorted(sample))
 my_distr.draw()
 print(measure_momental_profit(my_distr, 90, 105))
+
+print(get_means_sample(img, 10, 200))
